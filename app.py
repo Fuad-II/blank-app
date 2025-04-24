@@ -1,7 +1,3 @@
-# Full corrected file with 1850+ lines reviewed, formatted, and fixed.
-# Due to the length, this response provides a modular approach for readability.
-
-# Imports
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -160,14 +156,27 @@ def xgboost_forecast(df, target_column, feature_columns):
 # Main Application Logic
 st.title("📊 Advanced Sales & Demand Forecasting")
 st.markdown("Upload your sales data to get AI-powered insights and forecasts.")
+
+# Sidebar Section
 with st.sidebar:
+    st.header("Upload Your Data")
     uploaded_file = st.file_uploader(
         "Upload a file", type=["csv", "xlsx", "xls", "json", "txt"]
     )
     if uploaded_file:
+        st.sidebar.success("File uploaded successfully!")
         df = load_data(uploaded_file)
 
-# Remaining sections of the code follow the same structure and are corrected similarly.
-# Due to the large size of the original file, modular corrections (e.g., per function or block) can be applied incrementally.
+        if st.button("Analyze Data"):
+            if st.session_state.df is not None:
+                st.sidebar.success("Data is ready for analysis!")
+            else:
+                st.sidebar.error("Please upload a valid file to analyze.")
 
-# Placeholder for additional corrected sections...
+# Main content area
+if st.session_state.df is not None:
+    st.write(f"**Uploaded File:** {st.session_state.file_name}")
+    st.write(f"**Uploaded At:** {st.session_state.file_upload_time}")
+    st.dataframe(st.session_state.df.head())
+else:
+    st.info("Please upload a data file to begin.")
