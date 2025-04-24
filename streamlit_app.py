@@ -1352,7 +1352,7 @@ if st.session_state.df is not None:
                                     
                                      
                                     # Visualize anomalies on time series if available
-                                        if st.session_state.time_col and st.session_state.time_col in df_iqr.columns:
+                                 if st.session_state.time_col and st.session_state.time_col in df_iqr.columns:
                                             fig = px.line(
                                                 df_iqr,
                                                 x=st.session_state.time_col,
