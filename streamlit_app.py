@@ -23,50 +23,89 @@ st.set_page_config(
     layout="wide"
 )
 
-# Initialize session state variables if they don't exist
-if 'df' not in st.session_state:
-    st.session_state.df = None
-if 'file_name' not in st.session_state:
-    st.session_state.file_name = None
-if 'file_upload_time' not in st.session_state:
-    st.session_state.file_upload_time = None
-if 'predictions' not in st.session_state:
-    st.session_state.predictions = None
-if 'models' not in st.session_state:
-    st.session_state.models = {}
-if 'time_col' not in st.session_state:
-    st.session_state.time_col = None
-if 'target_col' not in st.session_state:
-    st.session_state.target_col = None
+# Initialize session state variables if they  xist
 
-# Function to load data
-def load_data(uploaded_file):
-    try:
-        file_extension = uploaded_file.name.split(".")[-1].lower()
+if 'df' not in :
+.session_state:
+    = ne
+if n st.session_state:
+t.session_state:
 
-        if file_extension == "csv":
-            df = pd.read_csv(uploaded_file)
-        elif file_extension in ["xls", "xlsx"]:
-            df = pd.read_excel(uploaded_file)
-        elif file_extension == "json":
-            df = pd.read_json(uploaded_file)
-        elif file_extension == "txt":
-            df = pd.read_csv(uploaded_file, sep="\t")
-        else:
-            st.error(f"Unsupported file format: {file_extension}")
-            return None
+t.session_state:
+t.session_state:
 
-        st.session_state.df = df
-        st.session_state.file_name = uploaded_file.name
-        st.session_state.file_upload_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        return df
-    except Exception as e:
-        st.error(f"Error loading file: {e}")
-        return None
+t.session_state:
 
-# Function to detect date columns
-def detect_date_columns(df):
-    date_columns = []
+t.session_state:
+t.session_state:
+
+t.session_state:
+t.session_state:
+
+t.session_state:
+t.session_state:t.session_state:
+
+t.session_state:
+t.session_state:
+
+t.session_state:
+t.session_state:
+
+t.session_state:
+    _name = None
+if e'  n .session_state:
+e' not in st.session_state:
+    e = 
+if dictions' not in 
+ot in st.session_state:
+      one
+if ' t  st.session_state:
+      {}
+if ol' in st.session_state:
+      one
+
+if get_col' not in :
+t in st.session_state:
+      None
+
+# to d ta
+ load_data(uploaded_file):
+   try:
+        file_extension = 
+ploaded_file.name.split(".")[-1].lower()
+
+
+        if  pd.read_csv(uploaded_file)
+       elif on in , "xlsx"]:
+            df = 
+        elif  = "json":
+            df = 
+        elif  == ":
+            df = _file, sep="\t")
+ else:
+            ted  ormat: {file_extension}")
+     n ne
+
+rn None
+
+        df = df
+on_state.df = df
+        e uploaded_file.name
+        n df
+n df
+n df
+  except  s e:
+        ror ing : {e}")
+       one
+
+# n to t date 
+def t_date_columns(df):
+:
+):
+:
+s(df):
+:
+    
     for col in df.columns:
         try:
             pd.to_datetime(df[col])
@@ -469,182 +508,199 @@ if st.session_state.df is not None:
                         fig = px.line(
                             pivot_df,
                             title="Weekly Sales by Year",
-                            labels={'value': 'Sales', 'Week': 'Week', 'variable': 'Year'}
-                        )
-                        st.plotly_chart(fig, use_container_width=True)
+                            labels={'value': 'Sales', 'Week': '': 'Year'}
+                     )
+   plotly_chart(fig, use_container_width=True)
 
-                    elif time_freq[1] == 'D':
-                        # For daily data, compare by month and day
-                        sales_growth_df['Year'] = sales_growth_df['Period'].dt.year
-                        sales_growth_df['Month'] = sales_growth_df['Period'].dt.month
-                        sales_growth_df['Day'] = sales_growth_df['Period'].dt.day
+  elif time_freq[1] == 'D':
+  For  ata, re month and day
+              f['Year'] = sales_growth_df['Period'].dt.year
+            _df['Month'] = sales_growth_df['Period'].dt.month
+         wth_df['Day'] = sales_growth_df['Period'].dt.day
 
-                        # Group by month
-                        monthly_df = sales_growth_df.groupby(['Year', 'Month'])['Sales'].sum().reset_index()
-                        pivot_monthly = monthly_df.pivot(index='Month', columns='Year', values='Sales')
+        # Group by month
+     monthly_df = oupby(['Year', 'Month'])['Sales'].sum().reset_index()
+         pivot_monthly = onth', columns='Year', values='Sales')
 
-                        fig = px.line(
-                            pivot_monthly,
-                            title="Monthly Sales by Year",
-                            labels={'value': 'Sales', 'Month': 'Month', 'variable': 'Year'}
-                        )
-                        st.plotly_chart(fig, use_container_width=True)
-            except Exception as e:
-                st.error(f"Error analyzing sales performance: {e}")
-        else:
-            st.warning("Please select both a time column and a target column in the sidebar to analyze sales performance.")
+ ig = px.line(
+                       pivot_monthly,
+     ="Monthly Sales by Year",
+         value':  Month':  variable': 'Year'}
+             )
+           hart(fig, use_container_width=True)
+  cept tion as e:
+        (f"Error  sales ance: {e}")
+  se:
+            se ect   ime mn   arget  in the to lyze       tab3:
+        nd ecasting")
 
-    with tab3:
-        st.header("Demand Forecasting")
+        if ol and st.session_state.target_col:
+     # ess  series data
+    df_ts = ime_series(df, e.time_col, st.session_state.target_col)
 
-        if st.session_state.time_col and st.session_state.target_col:
-            # Preprocess time series data
-            df_ts = preprocess_time_series(df, st.session_state.time_col, st.session_state.target_col)
+if ts not None:
+            ("Time Series Analysis")
 
-            if df_ts is not None:
-                st.subheader("Time Series Analysis")
+  # Plot time series
+  fig = px.line(
+            df_ts,
+        y=st.session_state.target_col,
+e Series for {st.session_state.target_col}"
+   )
+g, rue)
 
-                # Plot time series
-                fig = px.line(
-                    df_ts,
-                    y=st.session_state.target_col,
-                    title=f"Time Series for {st.session_state.target_col}"
-                )
-                st.plotly_chart(fig, use_container_width=True)
+_chart(fig, rue)
 
-                # Time series decomposition
-                st.subheader("Time Series Decomposition")
+g, rue)
 
-                # Allow user to select seasonality period
-                freq_mapping = {
-                    'Daily': 7,       # Weekly seasonality
-                    'Weekly': 52,     # Yearly seasonality
-                    'Monthly': 12,    # yearly seasonality
-                    'Quarterly': 4,   # Yearly seasonality
-                    'Custom': 0       # User-defined
-                }
+(fig, th=True)
 
-                selected_freq = st.selectbox(
-                    "Select Seasonality Period",
-                    options=list(freq_mapping.keys()),
-                    index=2  # Default to Monthly
-                )
+  e s 
+           r("Time Series Decomposition")
 
-                if selected_freq == 'Custom':
-                    custom_period = st.number_input("Enter custom seasonality period", min_value=2, value=12)
-                    period = custom_period
+ # ow r to t seasonality period
+  freq_mapping = {
+   ily':    # Weekly seasonality
+        : ,     # Yearly seasonality
+     hly':  # yearly seasonality
+          ':   # Yearly 
+':  # Yearly y
+asonality
+': 4,   # Yearly seasonality
+   stom':  # User-defined
+             }
+
+   selected_freq = st.selectbox(
+ "Select ty iod",
+ty iod",
+",
+sonality Period",
+           options=list(freq_mapping.keys()),
+         # fault to Monthly
+       )
+
+              )
+
+   elected_freq == 'Custom':
+    custom_period = er custom y period", , lue=12)
+ =2, e=12)
+12)
+12)
+ alue=2, )
+)
+12)
+ alue=2, )
+lue=12)
+)
+lue=12)
+ min_value=2, value=12)
+        custom_period
+               else:
+     period = freq_mapping[selected_freq]
+
+  Decompose time series
+ if df_ts) > # sure h ta points for decomposition
+      osition = time_series(df_ts, rget_col, period)
+
+          if decomposition:
+           # Plot decomposition
+      fig = igsize=(12, 10))
+            plt.subplot(411)
+            plt.plot(decomposition.observed)
+            plt.title('Observed')
+
+            plt.subplot(412)
+            plt.plot(decomposition.trend)
+            plt.title('Trend')
+
+            plt.subplot(413)
+            plt.plot(decomposition.seasonal)
+            plt.title('Seasonality')
+
+            plt.subplot(414)
+                                  plt.title('Residuals')
+
+  plt.tight_layout()
+                      st.pyplot(fig)
+
+  Calculate seasonality strength
+  var_seasonal = np.var(decomposition.seasonal)
+       var_resid = n.resid)
+ = np.var(decomposition.resid)
+                     = r_seasonal /   var_resid)
+
+                       Strength", f"{seasonality_strength:.4f}")
+
+             if ngth > 0.6:
+gth > 0.6:
+0.6:
+> 6:
+:
+0.6:
+nality_strength > 0.6:
+          trong al terns ed. ider nal casting ")
+nal ting ds.")
+s.")
+nal forecasting methods.")
+        elif trength > 0.3:
+ > :
+0.3:
+nality_strength > 0.3:
+          oderate  patterns detected.")
+              else:
+              seasonal  Simple ing ods might be 
                 else:
-                    period = freq_mapping[selected_freq]
+       else:
+             Not gh a ints for tion period }. d  least +1} data points.")
 
-                # Decompose time series
-                if len(df_ts) > period:  # Ensure enough data points for decomposition
-                    decomposition = decompose_time_series(df_ts, st.session_state.target_col, period)
+       # ng tion
+                e Demand Forecast")
 
-                    if decomposition:
-                        # Plot decomposition
-                        fig = plt.figure(figsize=(12, 10))
-                        plt.subplot(411)
-                        plt.plot(decomposition.observed)
-                        plt.title('Observed')
-
-                        plt.subplot(412)
-                        plt.plot(decomposition.trend)
-                        plt.title('Trend')
-
-                        plt.subplot(413)
-                        plt.plot(decomposition.seasonal)
-                        plt.title('Seasonality')
-
-                        plt.subplot(414)
-                        plt.plot(decomposition.resid)
-                        plt.title('Residuals')
-
-                        plt.tight_layout()
-                        st.pyplot(fig)
-
-                        # Calculate seasonality strength
-                        var_seasonal = np.var(decomposition.seasonal)
-                        var_resid = np.var(decomposition.resid)
-                        seasonality_strength = var_seasonal / (var_seasonal + var_resid)
-
-                        st.metric("Seasonality Strength", f"{seasonality_strength:.4f}")
-
-                        if seasonality_strength > 0.6:
-                            st.info("Strong seasonal patterns detected. Consider seasonal forecasting methods.")
-                        elif seasonality_strength > 0.3:
-                            st.info("Moderate seasonal patterns detected.")
-                        else:
-                            st.info("Weak seasonal patterns. Simple forecasting methods might be sufficient.")
-                else:
-                    st.warning(f"Not enough data points for decomposition with period {period}. Need at least {period+1} data points.")
-
-                # Forecasting section
-                st.subheader("Generate Demand Forecast")
-
-                forecast_periods = st.slider(
-                    "Number of periods to forecast",
-                    min_value=1,
-                    max_value=365,
+       t_periods = st.slider(
+        of periods to forecast",
+      min_value=1,
+              
                     value=30
-                )
+     value=30
+           )
 
-                forecasting_method = st.selectbox(
-                    "Select Forecasting Method",
-                    options=["Holt-Winters Exponential Smoothing", "Linear Regression", "XGBoost"],
-                    index=0
-                )
+     asting_method = st.selectbox(
+    "Select Method",
+ng Method",
+                 nters ntial ing", r Regression", "XGBoost"],
+     index=0
+           )
 
-                if st.button("Generate Forecast"):
-                    with st.spinner("Generating forecast..."):
-                        if forecasting_method == "Holt-Winters Exponential Smoothing":
-                            model, forecast = holt_winters_forecast(
-                                df_ts,
-                                st.session_state.target_col,
-                                forecast_periods
-                            )
+     if n("Generate Forecast"):
+        with enerating forecast..."):
+              if d == xponential 
+Holt-Winters Exponential Smoothing":
+   model, forecast = holt_winters_forecast(
+           df_ts,
+                     et_col,
+                               st.session_state.target_col,
+ forecast_periods
+                           )
 
-                            if model and forecast is not None:
-                                # Create forecast dataframe
-                                forecast_index = pd.date_range(
-                                    start=df_ts.index[-1] + pd.Timedelta(days=1),
-                                    periods=forecast_periods,
-                                    freq=pd.infer_freq(df_ts.index)
-                                )
-                                forecast_df = pd.DataFrame({
-                                    'Date': forecast_index,
-                                    'Forecast': forecast.values
-                                })
+ if l and forecast is not None:
+          # Create forecast dataframe
+                                  periods=forecast_periods,
+                      )
+                  forecast_df = pd.DataFrame({
+    e':         t': forecast.values
+ual vs forecast
+                         fig = go.Figure()
 
-                                # Plot actual vs forecast
-                                fig = go.Figure()
-
-                                # Add actual data
-                                fig.add_trace(go.Scatter(
-                                    x=df_ts.index,
-                                    y=df_ts[st.session_state.target_col],
-                                    name='Actual',
-                                    line=dict(color='blue')
-                                ))
-
-                                # Add forecast
-                                fig.add_trace(go.Scatter(
-                                    x=forecast_index,
-                                    y=forecast.values,
-                                    name='Forecast',
-                                    line=dict(color='red', dash='dot')
-                                ))
-
-                                fig.update_layout(
-                                    title='Actual vs Forecast',
-                                    xaxis_title='Date',
-                                    yaxis_title=st.session_state.target_col,
-                                    legend_title='Legend'
-                                )
-
-                                st.plotly_chart(fig, use_container_width=True)
-
-                                # Show forecast data
-                                st.subheader("Forecast Data")
+  dd ual data
+                            fig.add_trace(go.Scatter(
+        x=df_ts.index,
+                            y=df_ts[st.session_state.target_col],
+                                line    Add ast
+  ast',
+ 
+        
+                                         legend_title='Legend'
+     # ow ata")
                                 st.dataframe(forecast_df)
 
                                 # Save forecast to session state
@@ -662,254 +718,271 @@ if st.session_state.df is not None:
                             # Select features for regression
                             feature_cols = ['year', 'month', 'day', 'dayofweek', 'quarter']
 
+                     
                             # Train regression model
-                            model_info = linear_regression_forecast(
-                                df_features,
-                                st.session_state.target_col,
-                                feature_cols
-                            )
+  model_info =                       df_features,
+                         df_features,
+       st.session_state.target_col,
+                         feature_cols
+   )
 
-                            if model_info:
-                                # Create future dates for prediction
-                                last_date = df_features[st.session_state.time_col].max()
-                                future_dates = [last_date + timedelta(days=i+1) for i in range(forecast_periods)]
+                         if model_info:
+    #  future dates for prediction
+              last_date = df_features[st.session_state.time_col].max()
+      _dates = e timedelta(days=i+1) for i in range(forecast_periods)]
 
-                                future_df = pd.DataFrame({st.session_state.time_col: future_dates})
-                                future_df['year'] = future_df[st.session_state.time_col].dt.year
-                                future_df['month'] = future_df[st.session_state.time_col].dt.month
-                                future_df['day'] = future_df[st.session_state.time_col].dt.day
-                                future_df['dayofweek'] = future_df[st.session_state.time_col].dt.dayofweek
-                                future_df['quarter'] = future_df[st.session_state.time_col].dt.quarter
+   future_df = t.session_state.time_col: future_dates})
+      _df['year'] = future_df[st.session_state.time_col].dt.year
+                                future_df['day'] = _df['dayofweek'] = future_df[st.session_state.time_col].dt.dayofweek
+             future_df['quarter'] =            # Scale future features
+      _features =                       future_features_scaled = # Make ions
+                                predictions =    # Create forecast dataframe
+                forecast_df = pd.DataFrame({
+         forecast_df = pd.DataFrame({
+    forecast_df = pd.DataFrame({
+                  'Date': future_dates,
+          :                                 })
 
-                                # Scale future features
-                                future_features = future_df[feature_cols]
-                                future_features_scaled = model_info['scaler'].transform(future_features)
+# Plot                        fig = go.Figure()
 
-                                # Make predictions
-                                predictions = model_info['model'].predict(future_features_scaled)
+   # Add actual data
+                fig.add_trace(go.Scatter(
+                    x=df_features[st.session_state.time_col],
+                y=df_features[st.session_state.target_col],
+                    name='Actual',
+                line=dict(color='blue')
+                ))
 
-                                # Create forecast dataframe
-                                forecast_df = pd.DataFrame({
-                                    'Date': future_dates,
-                                    'Forecast': predictions
-                                })
+                # Add forecast
+              x=future_dates,
+                                y=predictions,
+    ed', dash='dot')
+                           ))
 
-                                # Plot actual vs forecast
-                                fig = go.Figure()
-
-                                # Add actual data
-                                fig.add_trace(go.Scatter(
-                                    x=df_features[st.session_state.time_col],
-                                    y=df_features[st.session_state.target_col],
-                                    name='Actual',
-                                    line=dict(color='blue')
-                                ))
-
-                                # Add forecast
-                                fig.add_trace(go.Scatter(
-                                    x=future_dates,
-                                    y=predictions,
-                                    name='Forecast',
-                                    line=dict(color='red', dash='dot')
-                                ))
-
-                                fig.update_layout(
-                                    title='Actual vs Forecast (Linear Regression)',
-                                    xaxis_title='Date',
-                                    yaxis_title=st.session_state.target_col,
+                   t (Linear )',
+e='Actual vs Forecast (Linear Regression)',
+                                          yaxis_title=st.session_state.target_col,
+     legend_title='Legend'
+e.target_col,
                                     legend_title='Legend'
-                                )
+     legend_title='Legend'
+                           )
 
-                                st.plotly_chart(fig, use_container_width=True)
-                                # Show forecast data
-                                st.subheader("Forecast Data")
-                                st.dataframe(forecast_df)
+     otly_chart(fig, use_container_width=True)
+                # Show forecast data
+st Data")
 
-                                # Display model metrics
-                                st.subheader("Model Performance")
-                                st.metric("Mean Squared Error", f"{model_info['mse']:.4f}")
-                                st.metric("R² Score", f"{model_info['r2']:.4f}")
+ata")
+                   st.dataframe(forecast_df)
 
-                                # Save forecast to session state
-                                st.session_state.predictions = forecast_df
-                                st.session_state.models['linear_regression'] = model_info
+             # Display model metrics
+   st.subheader("Model Performance")
+         ("Mean Squared Error", f"{model_info['mse']:.4f}")
+         st.metric("R² Score", f"{model_info['r2']:.4f}")
 
-                        elif forecasting_method == "XGBoost":
-                            # Create features from date
-                            df_features = df_ts.reset_index()
-                            df_features['year'] = df_features[st.session_state.time_col].dt.year
-                            df_features['month'] = df_features[st.session_state.time_col].dt.month
-                            df_features['day'] = df_features[st.session_state.time_col].dt.day
-                            df_features['dayofweek'] = df_features[st.session_state.time_col].dt.dayofweek
-                            df_features['quarter'] = df_features[st.session_state.time_col].dt.quarter
-                            df_features['is_weekend'] = df_features['dayofweek'].isin([5, 6]).astype(int)
+  Save st session state
+                        ions = forecast_df
+                         linear_regression'] = model_info
 
-                            # Create lag features if enough data
-                            if len(df_features) > 30:
-                                df_features['lag_1'] = df_features[st.session_state.target_col].shift(1)
-                                df_features['lag_7'] = df_features[st.session_state.target_col].shift(7)
-                                df_features['lag_30'] = df_features[st.session_state.target_col].shift(30)
-                                df_features['rolling_mean_7'] = df_features[st.session_state.target_col].rolling(window=7).mean()
-                                df_features['rolling_std_7'] = df_features[st.session_state.target_col].rolling(window=7).std()
-                                df_features = df_features.dropna()
+  if forecasting_method == "XGBoost":
+   # e features from date
+            df_features = df_ts.reset_index()
+  df_features['year'] = df_features[st.session_state.time_col].dt.year
+    eatures['month'] = df_features[st.session_state.time_col].dt.month
+         es['day'] = df_features[st.session_state.time_col].dt.day
+                df_features['dayofweek'] = ayofweek
+week'] = sion_state.time_col].dt.dayofweek
+col].dt.dayofweek
+week'] = df_features[st.session_state.time_col].dt.dayofweek
+                   r'] = df_features[st.session_state.time_col].dt.quarter
+                      d'] = tures['dayofweek'].isin([5, 6]).astype(int)
 
-                            # Select features for XGBoost
-                            feature_cols = [col for col in df_features.columns if col not in
-                                           [st.session_state.time_col, st.session_state.target_col]]
+# eate lag features if enough data
+if len(df_features) > 30:
+       if len(df_features) > 30:
+   df_features['lag_1'] = df_features[st.session_state.target_col].shift(1)
+      df_features['lag_7'] = df_features[st.session_state.target_col].shift(7)
+   features['lag_30'] = df_features[st.session_state.target_col].shift(30)
+           ['rolling_mean_7'] = df_features[st.session_state.target_col].rolling(window=7).mean()
+           ['rolling_std_7'] = df_features[st.session_state.target_col].rolling(window=7).std()
+            df_features = df_features.dropna()
 
-                            # Train XGBoost model
-                            model_info = xgboost_forecast(
-                                df_features,
-                                st.session_state.target_col,
-                                feature_cols
-                            )
+  Select s r Boost
+ct for ost
+ost
+ct features for XGBoost
+             = l r col in  if col not in
+state.time_col, st.session_state.target_col]]
 
+ XGBoost model
+                   model_info = xgboost_forecast(
+     ssion_state.target_col,
+                     st.session_state.target_col,
+           
                             if model_info:
-                                # Create future dates for prediction
-                                last_date = df_features[st.session_state.time_col].max()
-                                future_dates = [last_date + timedelta(days=i+1) for i in range(forecast_periods)]
+# eate future dates for prediction
+          last_date = df_features[st.session_state.time_col].max()
+          es = [last_date + ) for i in 
+imedelta(days=i+1) for i in range(forecast_periods)]
 
-                                future_df = pd.DataFrame({st.session_state.time_col: future_dates})
-                                future_df['year'] = future_df[st.session_state.time_col].dt.year
-                                future_df['month'] = future_df[st.session_state.time_col].dt.month
-                                future_df['day'] = future_df[st.session_state.time_col].dt.day
-                                future_df['dayofweek'] = future_df[st.session_state.time_col].dt.dayofweek
-                                future_df['quarter'] = future_df[st.session_state.time_col].dt.quarter
-                                future_df['is_weekend'] = future_df['dayofweek'].isin([5, 6]).astype(int)
+    future_df = .session_state.time_col: future_dates})
+       future_df['year'] = future_df[st.session_state.time_col].dt.year
+     future_df['month'] = future_df[st.session_state.time_col].dt.month
+      future_df['day'] = future_df[st.session_state.time_col].dt.day
+       df['dayofweek'] = future_df[st.session_state.time_col].dt.dayofweek
+              rter'] = future_df[st.session_state.time_col].dt.quarter
+                         uture_df['dayofweek'].isin([5, 6]).astype(int)
 
-                                # For advanced features like lags and rolling stats, we need to forecast iteratively
-                                # This is a simplified approach - for real applications, use recursive forecasting
-                                if 'lag_1' in feature_cols:
-                                    # Get last values from training data
-                                    last_values = df_features[st.session_state.target_col].tail(30).values
-                                    predictions = []
+  or anced es e gs  olling we d ely
+ing stats, we need to forecast iteratively
+ # s  a plified   for real ns, use ing
+ applications, use recursive forecasting
+   if '  st ues from training data
+                  last_values = df_features[st.session_state.target_col].tail(30).values
+    predictions = []
 
-                                    for i in range(forecast_periods):
-                                        # Create a single row for prediction
-                                        current_features = future_df.iloc[i:i+1].copy()
+                  for i in range(forecast_periods):
+  for i in ast_periods):
+_periods):
+                             for i in range(forecast_periods):
+  # te a single row for prediction
+                    current_features = future_df.iloc[i:i+1].copy()
 
-                                        # Add lag features
-                                        if i == 0:
-                                            current_features['lag_1'] = last_values[-1]
-                                            current_features['lag_7'] = last_values[-7] if len(last_values) >= 7 else last_values.mean()
-                                            current_features['lag_30'] = last_values[-30] if len(last_values) >= 30 else last_values.mean()
-                                        else:
-                                            current_features['lag_1'] = predictions[-1]
-                                            current_features['lag_7'] = last_values[-7+i] if i < 7 else predictions[i-7]
-                                            current_features['lag_30'] = last_values[-30+i] if i < 30 else predictions[i-30]
+ #  lag features
+                                   if i == 0:
+ current_features['lag_1'] = last_values[-1]
+               s['lag_7'] = 7] if st_values) >= 7 else last_values.mean()
+                       0'] = alues[-30] if s) 30 e last_values.mean()
+                                      else:
+      t_features['lag_1'] = predictions[-1]
+                      7'] = alues[-7+i] if i < 7 else predictions[i-7]
+                  lag_30'] = [-30+i] if i < 30 else predictions[i-30]
 
-                                        # Add rolling features (simplified)
-                                        current_features['rolling_mean_7'] = np.mean(last_values[-7:])
-                                        current_features['rolling_std_7'] = np.std(last_values[-7:])
+                 # Add rolling features (simplified)
+current_features['rolling_mean_7'] = np.mean(last_values[-7:])
+   current_features['rolling_std_7'] = np.std(last_values[-7:])
 
-                                        # Make prediction
-                                        pred = model_info['model'].predict(current_features[feature_cols])
-                                        predictions.append(pred[0])
+  ake                              pred = model_info['model'].predict(current_features[feature_cols])
+    predictions.append(pred[0])
 
-                                        # Update last_values for next iteration
-                                        last_values = np.append(last_values[1:], pred[0])
+ pdate    # Update last_values for next iteration
+                          # Update last_values for next iteration
+   # Update last_values for next iteration
+       last_values = [1:], ])
                                 else:
-                                    # Simple prediction without lag features
-                                    predictions = model_info['model'].predict(future_df[feature_cols])
+ # ple iction  lag res
+le prediction without lag features
+          predictions = model_info['model'].predict(future_df[feature_cols])
 
-                                # Create forecast dataframe
-                                forecast_df = pd.DataFrame({
-                                    'Date': future_dates,
-                                    'Forecast': predictions
-                                })
+        # Create forecast dataframe
+      forecast_df = pd.DataFrame({
+                'Date': future_dates,
+            'Forecast': predictions
+        })
 
-                                # Plot actual vs forecast
-                                fig = go.Figure()
+ot ual vs forecast
+                         fig = go.Figure()
 
-                                # Add actual data
+  dd ual data
+                            fig.add_trace(go.Scatter(
+
+    add_trace(go.Scatter(
+er(
+
                                 fig.add_trace(go.Scatter(
-                                    x=df_features[st.session_state.time_col],
-                                    y=df_features[st.session_state.target_col],
-                                    name='Actual',
-                                    line=dict(color='blue')
-                                ))
+   x=df_features[st.session_state.time_col],
+                 x=df_features[st.session_state.time_col],
+                                 line=dict(color='blue')
+                               ))
 
-                                # Add forecast
-                                fig.add_trace(go.Scatter(
-                                    x=future_dates,
-                                    y=predictions,
-                                    name='Forecast',
-                                    line=dict(color='red', dash='dot')
-                                ))
+  dd                                             x=future_dates,
+    y=predictions,
+                       ed', dash='dot')
+red', dash='dot')
+ed', dash='dot')
+                           ))
 
-                                fig.update_layout(
-                                    title='Actual vs Forecast (XGBoost)',
-                                    xaxis_title='Date',
-                                    yaxis_title=st.session_state.target_col,
-                                    legend_title='Legend'
-                                )
+     pdate_layout(
+                      fig.update_layout(
+              vs Forecast (XGBoost)',
+                        xaxis_title='Date',
+            st.session_state.target_col,
+                           yaxis_title=st.session_state.target_col,
+         legend_title='Legend'
+                       )
 
-                                st.plotly_chart(fig, use_container_width=True)
+         st.plotly_chart(fig, use_container_width=True)
 
-                                # Show forecast data
-                                st.subheader("Forecast Data")
-                                st.dataframe(forecast_df)
+  #               "Forecast Data")
+                      st.dataframe(forecast_df)
 
-                                # Display model metrics
-                                st.subheader("Model Performance")
-                                st.metric("Mean Squared Error", f"{model_info['mse']:.4f}")
-                                st.metric("R² Score", f"{model_info['r2']:.4f}")
+          # Display model metrics
+      st.subheader("Model Performance")
+      ric("Mean Squared Error",   st.metric("R² Score",          # Feature importance
+                      feature_imp = pd.DataFrame({
+             'Feature': list(model_info['feature_importance'].keys()),
+            'Importance': mportance'].values())
+re_importance'].values())
+nce': nce'].values())
+lues())
+_importance'].values())
+lues())
+nce':                           ', ascending=False)
 
-                                # Feature importance
-                                st.subheader("Feature Importance")
-                                feature_imp = pd.DataFrame({
-                                    'Feature': list(model_info['feature_importance'].keys()),
-                                    'Importance': list(model_info['feature_importance'].values())
-                                }).sort_values('Importance', ascending=False)
+                             fig = px.bar(
+ eature_imp,
+                                feature_imp,
+    x='Feature',
+                                y='Importance',
+    e='Feature ,
+tle='Feature Importance',
+                       color='Importance'
+       color='Importance'
+                         )
+       ly_chart(fig, to session state
+                     ictions = forecast_df
+                      s['xgboost'] = model_info
 
-                                fig = px.bar(
-                                    feature_imp,
-                                    x='Feature',
-                                    y='Importance',
-                                    title='Feature Importance',
-                                    color='Importance'
-                                )
-                                st.plotly_chart(fig, use_container_width=True)
+  f evious ions , ow nload 
+                if dictions is not None:
+    ubheader("Download Forecast")
 
-                                # Save forecast to session state
-                                st.session_state.predictions = forecast_df
-                                st.session_state.models['xgboost'] = model_info
+ st.cache_data
+                  @st.cache_data
+  f convert_df_to_csv(df):
+          def convert_df_to_csv(df):
+          return df.to_csv(index=False).encode('utf-8')
 
-                # If previous predictions exist, show download button
-                if st.session_state.predictions is not None:
-                    st.subheader("Download Forecast")
+     convert_df_to_csv(st.session_state.predictions)
 
-                    @st.cache_data
-                    def convert_df_to_csv(df):
-                        return df.to_csv(index=False).encode('utf-8')
+                   st.download_button(
+     load Forecast as CSV",
+       csv,
+                 f"forecast_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv",
+       "text/csv",
+                 key='download-csv'
+   )
+     se:
+:
+se:
+se:
+:
+se:
+            se ect   ime mn  a get mn r  rm and tab4:
+asticity
+y
+    ric_cols = 
 
-                    csv = convert_df_to_csv(st.session_state.predictions)
+        if  >= 2:
+        st.markdown("""
+    Price  f mand res how e e antity d  o price changes.
+    - If y -1: astic ** antity  more than price)
+  If ticity  1 and 0: ic and** ity ges  han e)
+s than price)
+     - If   -1: demand**  hanges  price)
+           """)
 
-                    st.download_button(
-                        "Download Forecast as CSV",
-                        csv,
-                        f"forecast_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv",
-                        "text/csv",
-                        key='download-csv'
-                    )
-        else:
-            st.warning("Please select both a time column and a target column in the sidebar to perform demand forecasting.")
-
-    with tab4:
-        st.header("Price Elasticity Analysis")
-
-        # Check if we have columns that could be used for price elasticity
-        numeric_cols = df.select_dtypes(include=['int64', 'float64']).columns.tolist()
-
-        if len(numeric_cols) >= 2:
-            st.markdown("""
-            Price elasticity of demand measures how sensitive the quantity demanded is to price changes.
-            - If elasticity < -1: **Elastic demand** (quantity changes more than price)
-            - If elasticity between -1 and 0: **Inelastic demand** (quantity changes less than price)
-            - If elasticity = -1: **Unit elastic demand** (quantity changes proportionally to price)
-            """)
-
-            # Let user select price and quantity columns
+ # t price and quantity columns
             price_col = st.selectbox(
                 "Select Price Column",
                 options=numeric_cols,
@@ -1176,9 +1249,8 @@ if st.session_state.df is not None:
                                     if "High" in characteristics[0] and "High" in characteristics[1]:
                                         st.write("**Recommendation:** Premium offerings, loyalty programs, VIP services")
                                     elif "Low" in characteristics[0] and "Low" in characteristics[1]:
-                                        st.write("**Recommendation:** Entry-level offerings, cost-effective solutions, retention focus")
-                                    elif "High" in characteristics[0] and "Low" in characteristics[1]:
-                                        st.write("**Recommendation:** Value-based offerings, educational content, upgrade paths")
+] and "Low" in characteristics[1]:
+                         n:** -level gs, ention  elif  n " in                            st.write("**Recommendation:** Value-based offerings, educational content, upgrade paths")
                                     elif "Low" in characteristics[0] and "High" in characteristics[1]:
                                         st.write("**Recommendation:** Feature-focused marketing, technical support, specialized solutions")
                                     else:
@@ -1349,55 +1421,39 @@ if st.session_state.df is not None:
 
                                     st.plotly_chart(fig, use_container_width=True)
 
-                                    
-                                     
-                                    # Visualize anomalies on time series if available
-                                    if st.session_state.time_col and st.session_state.time_col in df_iqr.columns:
-                                        fig = px.line(
-                                            df_iqr,
-                                            x=st.session_state.time_col,
-                                            y=anomaly_col,
-                                            title=f"IQR Anomaly Detection for {anomaly_col}"
-                                        )
-                                        fig.add_scatter(
-                                            x=anomalies[st.session_state.time_col],
-                                            y=anomalies[anomaly_col],
-                                            mode='markers',
-                                            marker=dict(color='red', size=10),
-                                            name='Anomalies'
-                                        )
-                                        st.plotly_chart(fig, use_container_width=True)
-
                                     # Display anomaly statistics
                                     st.subheader("Anomaly Statistics")
 
-# Calculate percentage of anomalies
-anomaly_pct = len(anomalies) / len(df_iqr) * 100
-st.metric("Percentage of Anomalies", f"{anomaly_pct:.2f}%")
+                                    # Calculate percentage of anomalies
+                                    anomaly_pct = len(anomalies) / len(df_iqr) * 100
+                                    st.metric("Percentage of Anomalies", f"{anomaly_pct:.2f}%")
 
-# Compare anomalies with normal data
-comparison = pd.DataFrame({
-    'Statistic': ['Mean', 'Median', 'Std Dev', 'Min', 'Max'],
-    'Normal Data': [
-        df_iqr[~df_iqr['Is_Anomaly']][anomaly_col].mean(),
-        df_iqr[~df_iqr['Is_Anomaly']][anomaly_col].median(),
-        df_iqr[~df_iqr['Is_Anomaly']][anomaly_col].std(),
-        df_iqr[~df_iqr['Is_Anomaly']][anomaly_col].min(),
-        df_iqr[~df_iqr['Is_Anomaly']][anomaly_col].max()
-    ],
-    'Anomalies': [
-        anomalies[anomaly_col].mean(),
-        anomalies[anomaly_col].median(),
-        anomalies[anomaly_col].std(),
-        anomalies[anomaly_col].min(),
-        anomalies[anomaly_col].max()
-    ]
-})
+                                    # Compare anomalies with normal data
+                                    comparison = pd.DataFrame({
+                                        'Statistic': ['Mean', 'Median', 'Std Dev', 'Min', 'Max'],
+                                        'Normal Data': [
+                                            df_iqr[~df_iqr['Is_Anomaly']][anomaly_col].mean(),
+                                            df_iqr[~df_iqr['Is_Anomaly']][anomaly_col].median(),
+                                            df_iqr[~df_iqr['Is_Anomaly']][anomaly_col].std(),
+                                            df_iqr[~df_iqr['Is_Anomaly']][anomaly_col].min(),
+                                            df_iqr[~df_iqr['Is_Anomaly']][anomaly_col].max()
+                                        ],
+                                        'Anomalies': [
+                                            anomalies[anomaly_col].mean(),
+                                            anomalies[anomaly_col].median(),
+                                            anomalies[anomaly_col].std(),
+                                            anomalies[anomaly_col].min(),
+                                            anomalies[anomaly_col].max()
+                                        ]
+                                    })
 
-st.dataframe(comparison, use_container_width=True)
-elif detection_method == "Isolation Forest":
-    # Import required library
-    from sklearn.ensemble import IsolationForest
+                                    st.dataframe(comparison, use_container_width=True)
+                                    if detection_method == "Isolation Forest":
+                                        # Import required library
+                                        from sklearn.ensemble import IsolationForest
+                                        st.success("No anomalies found using IQR method.")
+                                    else:
+                                        st.success("No anomalies found using IQR method.")
 
     # Set contamination parameter
     contamination = st.slider("Contamination (expected proportion of anomalies)",
@@ -1810,69 +1866,79 @@ elif analysis_type == "KPI Dashboard":
                         )
                     else:
                         # Find another numeric column for correlation
-                        other_numeric = [col for col in numeric_cols if col != metric]
+                        other_numeric = [col for col in s if col != metric]
 
-                        if other_numeric:
-                            corr_col = other_numeric[0]
-                            fig = px.scatter(
-                                df,
-                                x=metric,
-                                y=corr_col,
-                                title=f"{metric} vs {corr_col}",
-                                trendline="ols"
-                            )
+            if other_numeric:
+             corr_col = other_numeric[0]
+    fig = px.scatter(
+                      df,
+                  df,
+              x=metric,
+                  y=corr_col,
+              c} vs {corr_col}",
+                          trendline="ols"
+  )
                         else:
-                            # If no other numeric column, show cumulative distribution
-                            fig = px.ecdf(
-                                df,
-                                x=metric,
-                                title=f"Cumulative Distribution of {metric}"
-                            )
+#  o other column, show cumulative distribution
+    fig = px.ecdf(
+                      df,
+          x=metric,
+                x=metric,
+                ution of                  )
 
-                    st.plotly_chart(fig, use_container_width=True)
+                  )
 
-            # KPI summary insights
-            st.subheader("KPI Insights")
+                 )
 
-            # Generate some basic insights
-            insights = []
+   plotly_chart(fig, h=True)
 
-            for metric in kpi_metrics:
-                # Time trend insight
-                if time_col:
-                    df_sorted = df.sort_values(time_col)
-                    first_period = df_sorted.iloc[:len(df_sorted)//3][metric].mean()
-                    last_period = df_sorted.iloc[-len(df_sorted)//3:][metric].mean()
+_chart(fig, use_container_width=True)
 
-                    percent_change = (last_period - first_period) / first_period * 100 if first_period != 0 else 0
+# KPI 
+nsights
 
-                    if abs(percent_change) > 10:
-                        direction = "increased" if percent_change > 0 else "decreased"
-                        insights.append(f"**{metric}** has {direction} by {abs(percent_change):.1f}% from the first period to the last period.")
+            "KPI Insights")
 
-                # Variation insight
-                cv = df[metric].std() / df[metric].mean() * 100 if df[metric].mean() != 0 else 0
+       # some  nsights
+ some basic insights
+insights = []
 
-                if cv > 50:
-                    insights.append(f"**{metric}** shows high variability (CV = {cv:.1f}%), suggesting inconsistent performance.")
-                elif cv < 10:
-                    insights.append(f"**{metric}** is highly stable (CV = {cv:.1f}%), suggesting consistent performance.")
+ for metric in kpi_metrics:
+  ime d insight
+              if time_col:
+   df_sorted = df.sort_values(time_col)
+     first_period = df_sorted.iloc[:len(df_sorted)//3][metric].mean()
+last_period = df_sorted.iloc[-len(df_sorted)//3:][metric].mean()
 
-                # Group differences insight
-                if group_by_col:
-                    group_stats = df.groupby(group_by_col)[metric].mean()
-                    max_group = group_stats.idxmax()
-                    min_group = group_stats.idxmin()
-                    max_val = group_stats.max()
-                    min_val = group_stats.min()
+      t_change = d - t_period) /   100 if riod != 0 else 0
 
-                    if max_val > min_val * 1.5:
-                        insights.append(f"**{metric}** varies significantly across {group_by_col}: {max_group} performs {(max_val/min_val - 1)*100:.1f}% better than {min_group}.")
+     if ent_change) > 10:
+          = ncreased" if e 0 else sed"
+eased"
+sed"
+"decreased"
+                        ric}** has {direction} by  rom first  o e last ")
 
-            if insights:
-                for i, insight in enumerate(insights):
-                    st.markdown(f"{i+1}. {insight}")
-            else:
-                st.info("No significant insights detected in the selected KPIs.")
-        else:
-            st.info("Please select at least one KPI metric to generate the dashboard.")
+od to the last period.")
+
+ # Variation insight
+   cv = c].std() / mean() * 100 if ) != 0 else 0
+
+() != 0 else 0
+
+   cv > 50:
+                    *  igh ity =  nconsistent  < 
+ 
+ 
+
+ 
+insight
+f ol:
+  = c].mean()
+= )
+  ()
+
+
+()
+
+  
