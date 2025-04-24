@@ -1352,25 +1352,24 @@ if st.session_state.df is not None:
                                     
                                      
                                     # Visualize anomalies on time series if available
-                                 if st.session_state.time_col and st.session_state.time_col in df_iqr.columns:
-                                            fig = px.line(
-                                                df_iqr,
-                                                x=st.session_state.time_col,
-                                                y=anomaly_col,
-                                                title=f"IQR Anomaly Detection for {anomaly_col}"
-                                            )
-                                            fig.add_scatter(
-                                                x=anomalies[st.session_state.time_col],
-                                                y=anomalies[anomaly_col],
-                                                mode='markers',
-                                                marker=dict(color='red', size=10),
-                                                name='Anomalies'
-                                            )
-                                            st.plotly_chart(fig, use_container_width=True)
-                                            
+                                    if st.session_state.time_col and st.session_state.time_col in df_iqr.columns:
+                                        fig = px.line(
+                                            df_iqr,
+                                            x=st.session_state.time_col,
+                                            y=anomaly_col,
+                                            title=f"IQR Anomaly Detection for {anomaly_col}"
+                                        )
+                                        fig.add_scatter(
+                                            x=anomalies[st.session_state.time_col],
+                                            y=anomalies[anomaly_col],
+                                            mode='markers',
+                                            marker=dict(color='red', size=10),
+                                            name='Anomalies'
+                                        )
+                                        st.plotly_chart(fig, use_container_width=True)
 
-# Display anomaly statistics
-st.subheader("Anomaly Statistics")
+                                    # Display anomaly statistics
+                                    st.subheader("Anomaly Statistics")
 
 # Calculate percentage of anomalies
 anomaly_pct = len(anomalies) / len(df_iqr) * 100
@@ -1877,4 +1876,3 @@ elif analysis_type == "KPI Dashboard":
                 st.info("No significant insights detected in the selected KPIs.")
         else:
             st.info("Please select at least one KPI metric to generate the dashboard.")
-
