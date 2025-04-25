@@ -261,48 +261,65 @@ with st.sidebar:
 
 st.subheader("📈 Analysis Results")
 
-# Example: Decomposition
-try:
-    st.write("#### Time Series Decomposition")
-    # TODO: Add smarter period detection (e.g., based on index frequency) or user input
-    period = 12 # Default assumption (e.g., monthly for yearly data)
-    if isinstance(df_ts.index, pd.DatetimeIndex) and len(df_ts) > 2 * period:
-        decomposition = decompose_time_series(df_ts, selected_target_col, period=period)
-        if decomposition:
-            # Plot using Plotly
-            fig_decomp = px.line(decomposition.trend.dropna(), title='Trend Component')
-            st.plotly_chart(fig_decomp, use_container_width=True)
-            fig_seas = px.line(decomposition.seasonal.dropna(), title='Seasonal Component')
-            st.plotly_chart(fig_seas, use_container_width=True)
-            fig_resid = px.scatter(decomposition.resid.dropna(), title='Residual Component')
-            st.plotly_chart(fig_resid, use_container_width=True)
-        else:
-            st.warning("Could not perform time series decomposition.")
-    else:
-        st.warning(f"Decomposition requires a DatetimeIndex and sufficient data (more than {2*period} periods).")
-except Exception as e:
-     st.error(f"Error during decomposition: {e}")
+# Create tabs for different analysis sections
+tab1, tab2 = st.tabs(["Time Series Decomposition", "Holt-Winters Forecast"])
 
-# Example: Holt-Winters Forecasting
-try:
-    st.write("#### Holt-Winters Forecast")
-    forecast_periods = st.slider("Select forecast horizon (periods):", 1, 36, 12, key='hw_horizon')
-    # Ensure enough data for seasonality
-    if len(df_ts) > 12: # Assuming seasonal_periods=12
-        hw_model, hw_forecast = holt_winters_forecast(df_ts, selected_target_col, forecast_periods=forecast_periods)
-        if hw_model and hw_forecast is not None:
-            fig_hw = go.Figure()
-            fig_hw.add_trace(go.Scatter(x=df_ts.index, y=df_ts[selected_target_col], mode='lines', name='Historical Data'))
-            fig_hw.add_trace(go.Scatter(x=hw_forecast.index, y=hw_forecast, mode='lines', name='Holt-Winters Forecast', line=dict(dash='dash', color='red')))
-            fig_hw.update_layout(title=f'Holt-Winters Forecast ({forecast_periods} periods ahead)', xaxis_title='Time', yaxis_title=selected_target_col)
-            st.plotly_chart(fig_hw, use_container_width=True)
-            st.session_state['models']['Holt-Winters'] = {'model': hw_model, 'forecast': hw_forecast}
+with tab1:
+    # Example: Decomposition
+    try:
+        st.write("#### Time Series Decomposition")
+        # TODO: Add smarter period detection (e.g., based on index frequency) or user input
+        period = 12 # Default assumption (e.g., monthly for yearly data)
+        if isinstance(st.session_state.get('df_processed', pd.DataFrame()).index, pd.DatetimeIndex) and len(st.session_state.get('df_processed', pd.DataFrame())) > 2 * period:
+            # Use df_processed from session state
+            df_ts = st.session_state['df_processed']
+            selected_target_col = st.session_state.get('target_col')
+            if selected_target_col:
+                decomposition = decompose_time_series(df_ts, selected_target_col, period=period)
+                if decomposition:
+                    # Plot using Plotly
+                    fig_decomp = px.line(decomposition.trend.dropna(), title='Trend Component')
+                    st.plotly_chart(fig_decomp, use_container_width=True)
+                    fig_seas = px.line(decomposition.seasonal.dropna(), title='Seasonal Component')
+                    st.plotly_chart(fig_seas, use_container_width=True)
+                    fig_resid = px.scatter(decomposition.resid.dropna(), title='Residual Component')
+                    st.plotly_chart(fig_resid, use_container_width=True)
+                else:
+                    st.warning("Could not perform time series decomposition.")
+            else:
+                 st.warning("Target column not selected for decomposition.")
         else:
-            st.warning("Could not generate Holt-Winters forecast. Check data stationarity and seasonality.")
-    else:
-        st.warning("Not enough data for Holt-Winters model with seasonal component.")
-except Exception as e:
-     st.error(f"Error during Holt-Winters forecasting: {e}")
+            st.warning(f"Decomposition requires a DatetimeIndex and sufficient data (more than {2*period} periods).")
+    except Exception as e:
+         st.error(f"Error during decomposition: {e}")
+
+with tab2:
+    # Example: Holt-Winters Forecasting
+    try:
+        st.write("#### Holt-Winters Forecast")
+        forecast_periods = st.slider("Select forecast horizon (periods):", 1, 36, 12, key='hw_horizon')
+        # Ensure enough data for seasonality
+        if len(st.session_state.get('df_processed', pd.DataFrame())) > 12: # Assuming seasonal_periods=12
+            # Use df_processed from session state
+            df_ts = st.session_state['df_processed']
+            selected_target_col = st.session_state.get('target_col')
+            if selected_target_col:
+                hw_model, hw_forecast = holt_winters_forecast(df_ts, selected_target_col, forecast_periods=forecast_periods)
+                if hw_model and hw_forecast is not None:
+                    fig_hw = go.Figure()
+                    fig_hw.add_trace(go.Scatter(x=df_ts.index, y=df_ts[selected_target_col], mode='lines', name='Historical Data'))
+                    fig_hw.add_trace(go.Scatter(x=hw_forecast.index, y=hw_forecast, mode='lines', name='Holt-Winters Forecast', line=dict(dash='dash', color='red')))
+                    fig_hw.update_layout(title=f'Holt-Winters Forecast ({forecast_periods} periods ahead)', xaxis_title='Time', yaxis_title=selected_target_col)
+                    st.plotly_chart(fig_hw, use_container_width=True)
+                    st.session_state['models']['Holt-Winters'] = {'model': hw_model, 'forecast': hw_forecast}
+                else:
+                    st.warning("Could not generate Holt-Winters forecast. Check data stationarity and seasonality.")
+            else:
+                 st.warning("Target column not selected for Holt-Winters forecast.")
+        else:
+            st.warning("Not enough data for Holt-Winters model with seasonal component.")
+    except Exception as e:
+         st.error(f"Error during Holt-Winters forecasting: {e}")
 
 # TODO: Add calls for Linear Regression, XGBoost etc.
 # These would likely require feature engineering steps first.
