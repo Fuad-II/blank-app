@@ -166,8 +166,157 @@ with st.sidebar:
     )
     if uploaded_file:
         df = load_data(uploaded_file)
+        if df is not None:
+            st.success(f"File '{st.session_state.file_name}' uploaded successfully at {st.session_state.file_upload_time}.")
+            st.write("Uploaded Data Preview (first 5 rows):")
+            st.dataframe(df.head())
 
-# Remaining sections of the code follow the same structure and are corrected similarly.
-# Due to the large size of the original file, modular corrections (e.g., per function or block) can be applied incrementally.
+            # --- Column Selection and Analyse Button ---
+            with st.container(): # Group UI elements
+                st.header("⚙️ Configure Analysis")
+                
+                # Detect potential date columns
+                date_cols = detect_date_columns(df)
+                if not date_cols:
+                    st.warning("Could not automatically detect date columns. Please select manually.")
+                    possible_time_cols = df.columns.tolist()
+                else:
+                    st.info(f"Detected potential date columns: {', '.join(date_cols)}")
+                    # Prioritize detected date cols, then others
+                    possible_time_cols = date_cols + [col for col in df.columns if col not in date_cols] 
 
-# Placeholder for additional corrected sections...
+                time_col = st.selectbox(
+                    "1. Select the time/date column:", 
+                    possible_time_cols, 
+                    # Try to restore previous selection or default to first column
+                    index=possible_time_cols.index(st.session_state.get('time_col')) if st.session_state.get('time_col') in possible_time_cols else 0, 
+                    key='time_col_select',
+                    help="Select the column containing dates or timestamps for the analysis."
+                )
+                # Update session state immediately after selection
+                if time_col:
+                    st.session_state['time_col'] = time_col 
+
+                # Detect numeric columns for target, excluding the selected time column
+                numeric_cols = df.select_dtypes(include=np.number).columns.tolist()
+                possible_target_cols_all = [col for col in df.columns if col != time_col]
+                
+                # Prioritize numeric columns among the possible target columns
+                numeric_target_candidates = [col for col in numeric_cols if col != time_col]
+                non_numeric_target_candidates = [col for col in possible_target_cols_all if col not in numeric_target_candidates]
+                
+                possible_target_cols_ordered = numeric_target_candidates + non_numeric_target_candidates
+
+                if not numeric_target_candidates:
+                    st.warning("No numeric columns detected for target variable (excluding the time column). Analysis works best with numeric targets.")
+                
+                target_col = st.selectbox(
+                    "2. Select the target column (numeric preferred):", 
+                    possible_target_cols_ordered, 
+                    # Try to restore previous selection or default to first available
+                    index=possible_target_cols_ordered.index(st.session_state.get('target_col')) if st.session_state.get('target_col') in possible_target_cols_ordered else 0, 
+                    key='target_col_select',
+                    help="Select the numeric column you want to analyze and forecast (e.g., Sales, Demand)."
+                )
+                # Update session state immediately
+                if target_col:
+                    st.session_state['target_col'] = target_col 
+
+                st.header("🚀 Run Analysis")
+                # Use columns directly from session state for reliability in button logic
+                selected_time_col = st.session_state.get('time_col')
+                selected_target_col = st.session_state.get('target_col')
+
+                # --- Button Logic ---
+                button_disabled = not (selected_time_col and selected_target_col)
+                analysis_ready = False
+                tooltip_message = "Select both time and target columns to enable analysis."
+
+                if selected_target_col and selected_target_col in df.columns:
+                     if pd.api.types.is_numeric_dtype(df[selected_target_col]):
+                         analysis_ready = True
+                         tooltip_message = "Click to start the time series analysis and forecasting."
+                     else:
+                         st.error(f"Selected target column '{selected_target_col}' is not numeric. Please select a numeric column for analysis.")
+                         button_disabled = True # Also disable if target not numeric
+                         tooltip_message = f"Target column '{selected_target_col}' must be numeric."
+                
+                if st.button("📊 Analyse Data", disabled=button_disabled, type="primary", help=tooltip_message):
+                    if analysis_ready:
+                        st.info(f"Starting analysis with Time Column: '{selected_time_col}' and Target Column: '{selected_target_col}'...")
+                        
+                        with st.spinner("Processing data and running models... Please wait."):
+                            # Use a copy to avoid modifying the dataframe in session state directly during preprocessing
+                            df_copy = df.copy() 
+                            df_ts = preprocess_time_series(df_copy, selected_time_col, selected_target_col) 
+                            
+                            if df_ts is not None and not df_ts.empty:
+                                st.session_state['df_processed'] = df_ts
+                                st.success("Data preprocessed successfully!")
+                                
+                                with st.expander("View Processed Data Sample"):
+                                     st.dataframe(df_ts.head())
+
+                                # --- Trigger actual analysis functions ---
+                                st.subheader("📈 Analysis Results") 
+                                
+                                # Example: Decomposition
+                                try:
+                                    st.write("#### Time Series Decomposition")
+                                    # TODO: Add smarter period detection (e.g., based on index frequency) or user input
+                                    period = 12 # Default assumption (e.g., monthly for yearly data)
+                                    if isinstance(df_ts.index, pd.DatetimeIndex) and len(df_ts) > 2 * period:
+                                        decomposition = decompose_time_series(df_ts, selected_target_col, period=period)
+                                        if decomposition:
+                                            # Plot using Plotly
+                                            fig_decomp = px.line(decomposition.trend.dropna(), title='Trend Component')
+                                            st.plotly_chart(fig_decomp, use_container_width=True)
+                                            fig_seas = px.line(decomposition.seasonal.dropna(), title='Seasonal Component')
+                                            st.plotly_chart(fig_seas, use_container_width=True)
+                                            fig_resid = px.scatter(decomposition.resid.dropna(), title='Residual Component')
+                                            st.plotly_chart(fig_resid, use_container_width=True)
+                                        else:
+                                            st.warning("Could not perform time series decomposition.")
+                                    else:
+                                        st.warning(f"Decomposition requires a DatetimeIndex and sufficient data (more than {2*period} periods).")
+                                except Exception as e:
+                                     st.error(f"Error during decomposition: {e}")
+
+                                # Example: Holt-Winters Forecasting
+                                try:
+                                    st.write("#### Holt-Winters Forecast")
+                                    forecast_periods = st.slider("Select forecast horizon (periods):", 1, 36, 12, key='hw_horizon')
+                                    # Ensure enough data for seasonality
+                                    if len(df_ts) > 12: # Assuming seasonal_periods=12
+                                        hw_model, hw_forecast = holt_winters_forecast(df_ts, selected_target_col, forecast_periods=forecast_periods)
+                                        if hw_model and hw_forecast is not None:
+                                            fig_hw = go.Figure()
+                                            fig_hw.add_trace(go.Scatter(x=df_ts.index, y=df_ts[selected_target_col], mode='lines', name='Historical Data'))
+                                            fig_hw.add_trace(go.Scatter(x=hw_forecast.index, y=hw_forecast, mode='lines', name='Holt-Winters Forecast', line=dict(dash='dash', color='red')))
+                                            fig_hw.update_layout(title=f'Holt-Winters Forecast ({forecast_periods} periods ahead)', xaxis_title='Time', yaxis_title=selected_target_col)
+                                            st.plotly_chart(fig_hw, use_container_width=True)
+                                            st.session_state['models']['Holt-Winters'] = {'model': hw_model, 'forecast': hw_forecast}
+                                        else:
+                                            st.warning("Could not generate Holt-Winters forecast. Check data stationarity and seasonality.")
+                                    else:
+                                        st.warning("Not enough data for Holt-Winters model with seasonal component.")
+                                except Exception as e:
+                                     st.error(f"Error during Holt-Winters forecasting: {e}")
+                                
+                                # TODO: Add calls for Linear Regression, XGBoost etc. 
+                                # These would likely require feature engineering steps first.
+
+                                st.balloons() 
+                                st.success("Analysis Complete!")
+                                # --- End Trigger ---
+
+                            else:
+                                st.error("Failed to preprocess data. Check column selections, data format, and ensure data is not empty after preprocessing.")
+                    else:
+                         # This case handles when button is clicked but analysis_ready is False
+                         st.warning("Cannot start analysis. Please ensure a valid numeric target column is selected.")
+                         
+        else:
+             st.warning("File could not be loaded. Please check the file format and content.")
+
+# Placeholder for additional corrected sections... (Keep this structure if it was in the original response)
