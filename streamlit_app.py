@@ -141,7 +141,7 @@ def xgboost_forecast(df, target_column, feature_columns):
             X, y, test_size=0.2, random_state=42, shuffle=False
         )
         model = xgb.XGBRegressor(objective="reg:squarederror", n_estimators=100)
-        model.fit(X_train, y_test) # Corrected: fit on y_test instead of y_train
+        model.fit(X_train, y_train) # Corrected: fit on y_train
         return {
             "model": model,
             "mse": mean_squared_error(y_test, model.predict(X_test)),
