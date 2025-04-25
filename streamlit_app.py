@@ -262,7 +262,7 @@ with st.sidebar:
 st.subheader("📈 Analysis Results")
 
 # Create tabs for different analysis sections
-tab1, tab2 = st.tabs(["Time Series Decomposition", "Holt-Winters Forecast"])
+tab1, tab2, tab3 = st.tabs(["Time Series Decomposition", "Holt-Winters Forecast", "Advanced Models"])
 
 with tab1:
     # Example: Decomposition
@@ -320,6 +320,74 @@ with tab2:
             st.warning("Not enough data for Holt-Winters model with seasonal component.")
     except Exception as e:
          st.error(f"Error during Holt-Winters forecasting: {e}")
+
+with tab3:
+    st.write("#### Advanced Models (Linear Regression, XGBoost)")
+
+    if st.session_state.get('df_processed') is not None:
+        df_ts = st.session_state['df_processed']
+        selected_target_col = st.session_state.get('target_col')
+        selected_time_col = st.session_state.get('time_col')
+
+        if selected_target_col and selected_time_col:
+            # Exclude time and target columns from feature selection
+            possible_feature_cols = [col for col in df_ts.columns if col not in [selected_target_col, selected_time_col]]
+
+            if possible_feature_cols:
+                selected_feature_cols = st.multiselect(
+                    "Select feature columns for Linear Regression and XGBoost:",
+                    possible_feature_cols,
+                    default=possible_feature_cols, # Default to all available features
+                    key='advanced_features_select',
+                    help="Select columns to use as features in Linear Regression and XGBoost models. These should be numeric."
+                )
+
+                if st.button("Run Advanced Models", key='run_advanced_models_button'):
+                    if selected_feature_cols:
+                        st.info("Running Linear Regression and XGBoost models...")
+                        with st.spinner("Training advanced models..."):
+                            # Ensure selected features are numeric
+                            numeric_selected_features = [col for col in selected_feature_cols if pd.api.types.is_numeric_dtype(df_ts[col])]
+                            non_numeric_selected_features = [col for col in selected_feature_cols if col not in numeric_selected_features]
+
+                            if non_numeric_selected_features:
+                                st.warning(f"Ignoring non-numeric selected features for advanced models: {', '.join(non_numeric_selected_features)}")
+
+                            if numeric_selected_features:
+                                # Prepare data for models - need to reset index for feature columns
+                                df_model_data = df_ts.copy().reset_index()
+
+                                # Linear Regression
+                                lr_results = linear_regression_forecast(df_model_data, selected_target_col, numeric_selected_features)
+                                if lr_results:
+                                    st.write("##### Linear Regression Results")
+                                    st.write(f"Mean Squared Error (MSE): {lr_results['mse']:.4f}")
+                                    st.write(f"R-squared (R2): {lr_results['r2']:.4f}")
+                                    st.session_state['models']['Linear Regression'] = lr_results
+
+                                # XGBoost
+                                xgb_results = xgboost_forecast(df_model_data, selected_target_col, numeric_selected_features)
+                                if xgb_results:
+                                    st.write("##### XGBoost Results")
+                                    st.write(f"Mean Squared Error (MSE): {xgb_results['mse']:.4f}")
+                                    st.write(f"R-squared (R2): {xgb_results['r2']:.4f}")
+                                    st.write("Feature Importance:")
+                                    importance_df = pd.DataFrame({
+                                        'Feature': numeric_selected_features,
+                                        'Importance': xgb_results['importance']
+                                    }).sort_values('Importance', ascending=False)
+                                    st.dataframe(importance_df)
+                                    st.session_state['models']['XGBoost'] = xgb_results
+                            else:
+                                st.warning("No numeric feature columns selected or available for advanced models.")
+                    else:
+                        st.warning("Please select at least one feature column to run advanced models.")
+            else:
+                st.info("No other columns available to use as features for advanced models.")
+        else:
+            st.warning("Time and Target columns must be selected to run advanced models.")
+    else:
+        st.info("Please upload data and select Time and Target columns first.")
 
 # TODO: Add calls for Linear Regression, XGBoost etc.
 # These would likely require feature engineering steps first.
