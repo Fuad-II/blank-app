@@ -23,8 +23,7 @@ with st.sidebar:
     uploaded_file = st.file_uploader(
         "Upload a file", type=["csv", "xlsx", "xls", "json", "txt"]
     )
-    if uploaded_file:
-        df = load_data(uploaded_file)
+
 
 # Add an "Analyze Data" button
 if st.button("Analyze Data"):
