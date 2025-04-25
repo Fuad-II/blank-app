@@ -16,12 +16,26 @@ from sklearn.metrics import mean_squared_error, r2_score
 import xgboost as xgb
 from scipy import stats
 
-# Configure page settings
-st.set_page_config(
-    page_title="Advanced Sales & Demand Forecasting",
-    page_icon="📊",
-    layout="wide",
-)
+# Main Application Logic
+st.title("📊 Advanced Sales & Demand Forecasting")
+st.markdown("Upload your sales data to get AI-powered insights and forecasts.")
+with st.sidebar:
+    uploaded_file = st.file_uploader(
+        "Upload a file", type=["csv", "xlsx", "xls", "json", "txt"]
+    )
+    if uploaded_file:
+        df = load_data(uploaded_file)
+
+# Add an "Analyze Data" button
+if st.button("Analyze Data"):
+    if st.session_state["df"] is not None:
+        st.write("### Data Preview")
+        st.dataframe(st.session_state["df"].head())
+        
+        st.write("### Data Summary")
+        st.write(st.session_state["df"].describe())
+    else:
+        st.error("No data uploaded. Please upload a file to analyze.")
 
 # Initialize session state variables if they don't exist
 for key in [
